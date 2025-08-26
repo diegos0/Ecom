@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base::layout(~{::section})}">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>User Details</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+</head>
+<body>
+<section>
+    <div class="container mt-5 p-4">
+
+        <!-- Mensajes de éxito o error -->
+        <th:block th:if="${session.suchMsg}">
+            <p class="text-success fw-bold">[[${session.suchMsg}]]</p>
+            <th:block th:with="x=${@commonServiceImpl.removeSessionMessage()}"></th:block>
+        </th:block>
+
+        <th:block th:if="${session.errorMsg}">
+            <p class="text-danger fw-bold">[[${session.errorMsg}]]</p>
+            <th:block th:with="x=${@commonServiceImpl.removeSessionMessage()}"></th:block>
+        </th:block>
+
+        <!-- Tabla de datos del usuario -->
+        <div class="table-responsive mt-4">
+            <table class="table table-hover align-middle" style="border-radius: 10px; overflow: hidden;">
+                <thead class="table-primary">
+                <tr>
+                    <th class="text-center">ID</th>
+                    <th>Nombre</th>
+                    <th>Contacto</th>
+                    <th>Ubicación</th>
+                    <th class="text-center">Imagen</th>
+                    <th class="text-center">Estado</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+                </thead>
+                <tbody class="bg-white">
+                <tr>
+                <tr th:each="user : ${users}">
+                    <td class="text-center fw-bold" th:text="${user.id}">1</td>
+
+                    <td>
+                        <div class="fw-semibold" th:text="${user.name}">Nombre</div>
+                        <div class="text-muted small" th:text="${user.role}">ROLE_USER</div>
+                    </td>
+
+                    <td>
+                        <div th:text="${user.mobileNumber}">1234567890</div>
+                        <div class="text-primary small" th:text="${user.email}">email@ejemplo.com</div>
+                    </td>
+
+                    <td>
+                        <div th:text="${user.address}">Dirección</div>
+                        <div class="small" th:text="${user.city + ', ' + user.state + ' ' + user.pincode}">
+                            Ciudad, Estado 12345
+                        </div>
+                    </td>
+
+                    <td class="text-center">
+                        <img th:src="@{/img/product_img/profile_img/{img}(img=${user.profileImage})}"
+                             alt="Imagen de perfil" width="50" height="50"
+                             class="rounded-circle border border-light shadow-sm">
+                    </td>
+
+                    <td class="text-center">
+                    <span th:class="${user.isEnable} ? 'badge bg-success' : 'badge bg-secondary'"
+                          th:text="${user.isEnable} ? 'Activo' : 'Inactivo'">
+                        Activo
+                    </span>
+                    </td>
+
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</section>
+</body>
+</html>

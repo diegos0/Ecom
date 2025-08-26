@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+<head>
+    <meta charset="ISO-8859-1">
+    <title th:text="${product != null ? product.title : 'Product Details'}">Product Details</title>
+    <style>
+        .product-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .product-image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        .product-details {
+            padding-left: 2rem;
+        }
+        @media (max-width: 768px) {
+            .product-image-container {
+                margin-bottom: 2rem;
+            }
+            .product-details {
+                padding-left: 0;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<section>
+    <div class="container product-container p-5 mt-3 card-sh" style="margin-bottom: 80px;">
+        <!-- Messages Section -->
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-8">
+                <th:block th:if="${session.suchMsg}">
+                    <div class="alert alert-success text-center fw-bold mb-0">
+                        [[${session.suchMsg}]]
+                        <th:block th:with="x=${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                    </div>
+                </th:block>
+
+                <th:block th:if="${session.errorMsg}">
+                    <div class="alert alert-danger text-center fw-bold mb-0">
+                        [[${session.errorMsg}]]
+                        <th:block th:with="x=${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+
+        <!-- Product Content -->
+        <th:block th:if="${product != null}">
+            <div class="row justify-content-center">
+                <!-- Product Image -->
+                <div class="col-lg-5 col-md-6">
+                    <div class="product-image-container">
+                        <img th:src="@{'/img/product_img/' + ${product.image}}"
+                             alt="Product Image"
+                             class="img-fluid rounded shadow"
+                             style="max-height: 500px; width: auto;"
+                             onerror="this.src='/img/product_img/default.jpg'">
+                    </div>
+                </div>
+
+                <!-- Product Details -->
+                <div class="col-lg-5 col-md-6 product-details">
+                    <h1 class="fw-bold mb-3">[[${product.title}]]</h1>
+
+                    <div class="mb-4">
+                        <h5 class="fw-bold">Description:</h5>
+                        <p class="text-muted">[[${product.description}]]</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="fw-bold">Product Details:</h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <span class="fw-bold">Status:</span>
+                                <th:block th:if="${product.stock > 0}">
+                                    <th:block th:if="${user==null}">
+                                        <a>
+                                            href="/signin" class="btn btn-danger col-md-12"> ADD to CAR
+                                        </a>
+                                    </th:block>
+
+                                    <th:block th:unless="${user==null}">
+                                        <a>
+                                            href="/#" class="btn btn-danger col-md-12"> ADD to CAR
+                                        </a>
+                                    </th:block>
+                                    <span class="badge bg-success ms-2">Available</span>
+                                </th:block>
+                                <th:block th:unless="${product.stock > 0}">
+                                    <span class="badge bg-warning ms-2">Out of Stock</span>
+                                </th:block>
+                            </li>
+                            <li class="mb-2"><span class="fw-bold">Category:</span> [[${product.category.name}]]</li>
+                            <li class="mb-2"><span class="fw-bold">Policy:</span> 7 Days Replacement & Return</li>
+                        </ul>
+                    </div>
+
+                    <!-- Price Section -->
+                    <div class="mb-4 p-3 bg-light rounded">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <span class="fs-3 fw-bold text-success">
+                                    <i class="fas fa-rupee-sign"></i>
+                                    [[${product.discountPrice}]]
+                                </span>
+                                <span class="fs-6 text-decoration-line-through text-secondary ms-2">
+                                    [[${product.price}]]
+                                </span>
+                                <span class="badge bg-success ms-2">[[${product.discount}]]% OFF</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Features Icons -->
+                    <div class="row text-center g-3 mb-4">
+                        <div class="col-md-4">
+                            <div class="p-2 border rounded h-100">
+                                <i class="fas fa-money-bill-wave fa-2x text-success mb-2"></i>
+                                <p class="mb-0 small">Cash On Delivery</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-2 border rounded h-100">
+                                <i class="fas fa-undo-alt fa-2x text-danger mb-2"></i>
+                                <p class="mb-0 small">Return Available</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-2 border rounded h-100">
+                                <i class="fas fa-truck-moving fa-2x text-primary mb-2"></i>
+                                <p class="mb-0 small">Free Shipping</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-3">
+                        <th:block th:if="${product.stock > 0}">
+                            <th:block th:if="${user == null}">
+                                <a href="/signin" class="btn btn-danger btn-lg py-3">
+                                    <i class="fas fa-cart-plus me-2"></i>Add To Cart
+                                </a>
+                            </th:block>
+                            <th:block th:unless="${user == null}">
+                                <a th:href="@{'/user/addCart?pid=' + ${product.id} + '&uid=' + ${user.id}}"
+                                   class="btn btn-danger btn-lg py-3">
+                                    <i class="fas fa-cart-plus me-2"></i>Add To Cart
+                                </a>
+                            </th:block>
+                        </th:block>
+                        <th:block th:unless="${product.stock > 0}">
+                            <button class="btn btn-warning text-white btn-lg py-3" disabled>
+                                <i class="fas fa-exclamation-circle me-2"></i>Out of Stock
+                            </button>
+                        </th:block>
+                        <a href="/products" class="btn btn-outline-secondary btn-lg py-3">
+                            <i class="fas fa-arrow-left me-2"></i>Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </th:block>
+
+        <!-- Product Not Found -->
+        <th:block th:unless="${product != null}">
+            <div class="row justify-content-center">
+                <div class="col-md-8 text-center py-5">
+                    <div class="alert alert-danger fw-bold">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                        <h3>Product not found or unavailable</h3>
+                        <p class="mt-3">
+                            <a href="/products" class="btn btn-primary px-4">
+                                <i class="fas fa-store me-2"></i>Browse Products
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </th:block>
+    </div>
+</section>
+</body>
+</html>
